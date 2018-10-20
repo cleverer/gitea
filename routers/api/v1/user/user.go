@@ -27,15 +27,29 @@ func Search(ctx *context.APIContext) {
 	//   in: query
 	//   description: keyword
 	//   type: string
+	// - name: uid
+	//   in: query
+	//   description: ID of the user to search for
+	//   type: integer
 	// - name: limit
 	//   in: query
 	//   description: maximum number of users to return
 	//   type: integer
 	// responses:
 	//   "200":
-	//     "$ref": "#/responses/UserList"
+	//     description: "SearchResults of a successful search"
+	//     schema:
+	//       type: object
+	//       properties:
+	//         ok:
+	//           type: boolean
+	//         data:
+	//           type: array
+	//           items:
+	//             "$ref": "#/definitions/User"
 	opts := &models.SearchUserOptions{
 		Keyword:  strings.Trim(ctx.Query("q"), " "),
+		UID:      com.StrTo(ctx.Query("uid")).MustInt64(),
 		Type:     models.UserTypeIndividual,
 		PageSize: com.StrTo(ctx.Query("limit")).MustInt(),
 	}
@@ -60,7 +74,7 @@ func Search(ctx *context.APIContext) {
 			AvatarURL: users[i].AvatarLink(),
 			FullName:  markup.Sanitize(users[i].FullName),
 		}
-		if ctx.IsSigned {
+		if ctx.IsSigned && (!users[i].KeepEmailPrivate || ctx.User.IsAdmin) {
 			results[i].Email = users[i].Email
 		}
 	}

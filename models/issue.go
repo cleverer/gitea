@@ -112,6 +112,10 @@ func (issue *Issue) GetPullRequest() (pr *PullRequest, err error) {
 	}
 
 	pr, err = getPullRequestByIssueID(x, issue.ID)
+	if err != nil {
+		return nil, err
+	}
+	pr.Issue = issue
 	return
 }
 
@@ -964,7 +968,7 @@ func newIssue(e *xorm.Session, doer *User, opts NewIssueOptions) (err error) {
 
 	// Insert the assignees
 	for _, assigneeID := range opts.AssigneeIDs {
-		err = opts.Issue.changeAssignee(e, doer, assigneeID)
+		err = opts.Issue.changeAssignee(e, doer, assigneeID, true)
 		if err != nil {
 			return err
 		}
