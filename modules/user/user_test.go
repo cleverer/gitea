@@ -13,12 +13,12 @@ func getWhoamiOutput() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return strings.TrimSpace(string(output[:])), nil
+	return strings.TrimSpace(string(output)), nil
 }
 
 func TestCurrentUsername(t *testing.T) {
 	user := CurrentUsername()
-	if len(user) <= 0 {
+	if len(user) == 0 {
 		t.Errorf("expected non-empty user, got: %s", user)
 	}
 	// Windows whoami is weird, so just skip remaining tests
